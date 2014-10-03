@@ -1,0 +1,131 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Net.Sockets;
+using System.Linq;
+using System.Text;
+using System.Net;
+using DarkMultiPlayerCommon;
+using MessageStream;
+
+namespace DarkMultiPlayerServer
+{
+    public class RCON
+    {
+        public static TcpListener rconListener;
+
+        public static void StartRCONServer()
+        {
+            if (Settings.settingsStore.rconPort > 0)
+            {
+                DarkLog.Normal("Starting RCON server...");
+                try
+                {
+                    IPAddress bindAddress = IPAddress.Parse(Settings.settingsStore.address);
+                    rconListener = new TcpListener(bindAddress, Settings.settingsStore.rconPort);
+                    rconListener.Start(4);
+                    rconListener.BeginAcceptTcpClient(new AsyncCallback(ClientCallback), null);
+                }
+                catch (Exception e)
+                {
+                    DarkLog.Error("Error while starting RCON Server!, Exception: " + e);
+                }
+            }
+        }
+
+        private static void ClientCallback(IAsyncResult result)
+        {
+            try
+            {
+                TcpListener listener = (TcpListener)result.AsyncState;
+                TcpClient client = listener.EndAcceptTcpClient(result);
+
+                byte[] bytes = new byte[256];
+                string data = null;
+
+                NetworkStream stream = client.GetStream();
+                int i;
+                while ((i = stream.Read(bytes, 0, bytes.Length)) != 0)
+                {
+                    using (MessageReader mr = new MessageReader(bytes, false))
+                    {
+
+                    }
+                    data = Encoding.ASCII.GetString(bytes, 0, i);
+                    Console.WriteLine("[RCON] Received from " + client.Client.RemoteEndPoint + ": " + data);
+
+                    data = data.ToUpper();
+
+                    byte[] msg = Encoding.ASCII.GetBytes(data);
+
+                    stream.Write(msg, 0, msg.Length);
+                    Console.WriteLine("[RCON] Sent '" + data + "' to " + client.Client.RemoteEndPoint);
+                }
+
+                client.Close();
+
+                Console.WriteLine("Client connected and disconnected.");
+            }
+            catch (Exception e)
+            {
+                DarkLog.Error("Error in RCON Callback!, Exception: " + e);
+            }
+        }
+
+        public static void StopRCONServer()
+        {
+            if (Settings.settingsStore.rconPort > 0)
+            {
+                DarkLog.Normal("Stopping RCON server...");
+                rconListener.Stop();
+            }
+        }
+
+        public static void ForceStopRCONServer()
+        {
+            if (Settings.settingsStore.rconPort > 0)
+            {
+                DarkLog.Normal("Force stopping RCON server...");
+                if (rconListener != null)
+                {
+                    try
+                    {
+                        rconListener.Stop();
+                    }
+                    catch (Exception e)
+                    {
+                        DarkLog.Fatal("Error trying to shutdown RCON server: " + e);
+                        throw;
+                    }
+                }
+            }
+        }
+
+        public static void HandleMessage(TcpClient client,  RCONMessage message)
+        {
+            try
+            {
+                switch (message.type)
+                {
+                    case RCONMessageType.HEARTBEAT:
+                        break;
+                    case RCONMessageType.SAY:
+                        HandleSayMessage(client, message.data);
+                        break;
+                    default:
+                        DarkLog.Debug("[RCON] Unhandled message type " + message.type);
+                        break;
+                        
+                }
+            }
+            catch (Exception e)
+            {
+                DarkLog.Debug("Error handling " + message.type + " from " + client.Client.RemoteEndPoint + ", exception: " + e);
+            }
+        }
+
+        private static void HandleSayMessage(TcpClient client, byte[] messageData)
+        {
+
+        }
+    }
+}

@@ -173,6 +173,7 @@ namespace DarkMultiPlayerServer
             descriptionList.Add("consoleIdentifier", "Specify the name that will appear when you send a message using the server's console.");
             descriptionList.Add("serverMotd", "Specify the server's MOTD (message of the day).");
             descriptionList.Add("expireScreenshots", "Specify the amount of days a screenshot should be considered as expired and deleted. 0 = Disabled");
+            descriptionList.Add("rconPort", "Port for RCON (remote console). 0 = Disabled");
             return descriptionList;
         }
     }
@@ -202,5 +203,6 @@ namespace DarkMultiPlayerServer
         public string consoleIdentifier = "Server";
         public string serverMotd = "Welcome, %name%!";
         public double expireScreenshots = 0;
+        public int rconPort = 6700;
     }
 }

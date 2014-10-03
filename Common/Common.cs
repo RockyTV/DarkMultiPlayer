@@ -552,4 +552,17 @@ namespace DarkMultiPlayerCommon
         INVALID_PLAYERNAME = 98,
         MALFORMED_HANDSHAKE = 99
     }
+
+    public enum RCONMessageType
+    {
+        HEARTBEAT,
+        SAY,
+        DISCONNECT
+    }
+
+    public class RCONMessage
+    {
+        public RCONMessageType type;
+        public byte[] data;
+    }
 }
