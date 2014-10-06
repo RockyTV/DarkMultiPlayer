@@ -112,6 +112,9 @@ namespace DarkMultiPlayerServer
                     case RCONMessageType.SAY:
                         HandleSayMessage(client, message.data);
                         break;
+                    case RCONMessageType.DISCONNECT:
+                        HandleDisconnect(client, message.data);
+                        break;
                     default:
                         DarkLog.Debug("[RCON] Unhandled message type " + message.type);
                         break;
@@ -122,18 +125,6 @@ namespace DarkMultiPlayerServer
             {
                 DarkLog.Debug("Error handling " + message.type + " from " + client.Client.RemoteEndPoint + ", exception: " + e);
             }
-        }
-
-        private static void Heartbeat(TcpClient client)
-        {
-            RCONMessage newMessage = new RCONMessage();
-            newMessage.type = RCONMessageType.HEARTBEAT_REPLY;
-            using (MessageWriter mw = new MessageWriter())
-            {
-                mw.Write<string>("PONG : " + (DateTime.UtcNow.Subtract(new DateTime(1970, 1, 1))).TotalSeconds);
-                newMessage.data = mw.GetMessageBytes();
-            }
-            SendToClient(client, newMessage);
         }
 
         private static void SendToClient(TcpClient client, RCONMessage message)
@@ -149,9 +140,30 @@ namespace DarkMultiPlayerServer
             }
         }
 
+        private static void Heartbeat(TcpClient client)
+        {
+            RCONMessage newMessage = new RCONMessage();
+            newMessage.type = RCONMessageType.HEARTBEAT_REPLY;
+            using (MessageWriter mw = new MessageWriter())
+            {
+                mw.Write<string>("PONG : " + (DateTime.UtcNow.Subtract(new DateTime(1970, 1, 1))).TotalSeconds);
+                newMessage.data = mw.GetMessageBytes();
+            }
+            SendToClient(client, newMessage);
+        }
+
         private static void HandleSayMessage(TcpClient client, byte[] messageData)
         {
 
+        }
+
+        private static void HandleDisconnect(TcpClient client, byte[] messageData)
+        {
+            using (MessageReader mr = new MessageReader(messageData, false))
+            {
+                string reason = mr.Read<string>();
+                DarkLog.Debug("[RCON] Client " + client.Client.RemoteEndPoint + " disconnected: " + reason);
+            }
         }
     }
 }
