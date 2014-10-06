@@ -46,12 +46,12 @@ namespace DarkMultiPlayerServer
                 int i;
                 while ((i = stream.Read(bytes, 0, bytes.Length)) != 0)
                 {
+                 //   data = Encoding.ASCII.GetString(bytes, 0, i);
+                 //   Console.WriteLine("[RCON] Received from " + client.Client.RemoteEndPoint + ": " + data);
                     using (MessageReader mr = new MessageReader(bytes, false))
                     {
-
+                        HandleMessage(client, mr.Read<RCONMessage>());
                     }
-                    data = Encoding.ASCII.GetString(bytes, 0, i);
-                    Console.WriteLine("[RCON] Received from " + client.Client.RemoteEndPoint + ": " + data);
 
                     data = data.ToUpper();
 
