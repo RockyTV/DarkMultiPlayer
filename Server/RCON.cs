@@ -53,7 +53,6 @@ namespace DarkMultiPlayerServer
                         HandleMessage(client, mr.Read<RCONMessage>());
                     }
 //
-                    //
                 }
 
                 client.Close();
