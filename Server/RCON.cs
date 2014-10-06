@@ -53,12 +53,6 @@ namespace DarkMultiPlayerServer
                         HandleMessage(client, mr.Read<RCONMessage>());
                     }
 
-                    data = data.ToUpper();
-
-                    byte[] msg = Encoding.ASCII.GetBytes(data);
-
-                    stream.Write(msg, 0, msg.Length);
-                    Console.WriteLine("[RCON] Sent '" + data + "' to " + client.Client.RemoteEndPoint);
                 }
 
                 client.Close();
