@@ -106,7 +106,8 @@ namespace DarkMultiPlayerServer
             {
                 switch (message.type)
                 {
-                    case RCONMessageType.HEARTBEAT:
+                    case RCONMessageType.HEARTBEAT_REQUEST:
+                        Heartbeat(client);
                         break;
                     case RCONMessageType.SAY:
                         HandleSayMessage(client, message.data);
@@ -120,6 +121,31 @@ namespace DarkMultiPlayerServer
             catch (Exception e)
             {
                 DarkLog.Debug("Error handling " + message.type + " from " + client.Client.RemoteEndPoint + ", exception: " + e);
+            }
+        }
+
+        private static void Heartbeat(TcpClient client)
+        {
+            RCONMessage newMessage = new RCONMessage();
+            newMessage.type = RCONMessageType.HEARTBEAT_REPLY;
+            using (MessageWriter mw = new MessageWriter())
+            {
+                mw.Write<string>("PONG : " + (DateTime.UtcNow.Subtract(new DateTime(1970, 1, 1))).TotalSeconds);
+                newMessage.data = mw.GetMessageBytes();
+            }
+            SendToClient(client, newMessage);
+        }
+
+        private static void SendToClient(TcpClient client, RCONMessage message)
+        {
+            try
+            {
+                NetworkStream stream = client.GetStream();
+                stream.Write(message.data, 0, message.data.Length);
+            }
+            catch (Exception e)
+            {
+                DarkLog.Error("[RCON] Error while trying to send message to client!, Exception: " + e);
             }
         }
 

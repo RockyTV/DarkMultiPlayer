@@ -555,7 +555,8 @@ namespace DarkMultiPlayerCommon
 
     public enum RCONMessageType
     {
-        HEARTBEAT,
+        HEARTBEAT_REQUEST,
+        HEARTBEAT_REPLY,
         SAY,
         DISCONNECT
     }
