@@ -1,7 +1,7 @@
 ﻿using System;
 using System.IO;
-using DarkMultiPlayerCommon;
 using MessageStream2;
+using DarkMultiPlayerCommon;
 
 namespace DarkMultiPlayerServer.Messages
 {
@@ -26,6 +26,7 @@ namespace DarkMultiPlayerServer.Messages
                 mw.Write<int>(Settings.settingsStore.screenshotHeight);
                 mw.Write<int>(Settings.settingsStore.numberOfAsteroids);
                 mw.Write<string>(Settings.settingsStore.consoleIdentifier);
+                mw.Write<bool>(Settings.settingsStore.isPassworded);
                 mw.Write<int>((int)Settings.settingsStore.gameDifficulty);
                 if (Settings.settingsStore.gameDifficulty == GameDifficulty.CUSTOM)
                 {
@@ -42,6 +43,10 @@ namespace DarkMultiPlayerServer.Messages
                     mw.Write<float>(GameplaySettings.settingsStore.startingFunds);
                     mw.Write<float>(GameplaySettings.settingsStore.startingReputation);
                     mw.Write<float>(GameplaySettings.settingsStore.startingScience);
+                }
+                if (Settings.settingsStore.isPassworded)
+                {
+                    mw.Write<string>(Common.CalculateMD5Hash(Settings.settingsStore.serverPassword));
                 }
                 newMessage.data = mw.GetMessageBytes();
             }

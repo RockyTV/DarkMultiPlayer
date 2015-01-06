@@ -63,6 +63,10 @@ namespace DarkMultiPlayer
         private string serverMotd;
         private bool displayMotd;
 
+        //Server password
+        public string svPassword;
+        public bool isPassworded;
+
         public NetworkWorker()
         {
             lock (Client.eventLock)
@@ -85,6 +89,11 @@ namespace DarkMultiPlayer
             {
                 terminateThreadsOnNextUpdate = false;
                 TerminateThreads();
+            }
+
+            if (isPassworded)
+            {
+                PasswordWindow.fetch.display = true;
             }
 
             if (state == ClientState.CONNECTED)
@@ -1030,6 +1039,7 @@ namespace DarkMultiPlayer
                 ScreenshotWorker.fetch.screenshotHeight = mr.Read<int>();
                 AsteroidWorker.fetch.maxNumberOfUntrackedAsteroids = mr.Read<int>();
                 ChatWorker.fetch.consoleIdentifier = mr.Read<string>();
+                isPassworded = mr.Read<bool>();
                 Client.fetch.serverDifficulty = (GameDifficulty)mr.Read<int>();
                 if (Client.fetch.serverDifficulty != GameDifficulty.CUSTOM)
                 {
@@ -1052,6 +1062,10 @@ namespace DarkMultiPlayer
                     newParameters.Career.StartingReputation = mr.Read<float>();
                     newParameters.Career.StartingScience = mr.Read<float>();
                     Client.fetch.serverParameters = newParameters;
+                }
+                if (isPassworded)
+                {
+                    svPassword = mr.Read<string>();
                 }
             }
         }

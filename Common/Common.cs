@@ -23,6 +23,10 @@ namespace DarkMultiPlayerCommon
         //Compression threshold
         public const int COMPRESSION_THRESHOLD = 4096;
 
+        //Passwords
+        private static string SALT = "RGFya011bHRpUGxheWVy";
+        private static byte[] MD5_SALT = Convert.FromBase64String(SALT);
+
         public static string CalculateSHA256Hash(string fileName)
         {
             return CalculateSHA256Hash(File.ReadAllBytes(fileName));
@@ -38,6 +42,21 @@ namespace DarkMultiPlayerCommon
                 for (int i = 0; i < fileHashData.Length; i++)
                 {
                     sb.Append(fileHashData[i].ToString("x2"));
+                }
+            }
+            return sb.ToString();
+        }
+
+        public static string CalculateMD5Hash(string data)
+        {
+            StringBuilder sb = new StringBuilder();
+            using (HMACMD5 md5 = new HMACMD5(MD5_SALT))
+            {
+                byte[] stringHashData = md5.ComputeHash(Encoding.UTF8.GetBytes(data));
+                //Byte[] to string conversion adapted from MSDN...
+                for (int i = 0; i < stringHashData.Length; i++)
+                {
+                    sb.Append(stringHashData[i].ToString("x2"));
                 }
             }
             return sb.ToString();
