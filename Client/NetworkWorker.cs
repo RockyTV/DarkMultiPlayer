@@ -1066,6 +1066,8 @@ namespace DarkMultiPlayer
                     newParameters.Difficulty.BypassEntryPurchaseAfterResearch = mr.Read<bool>();
                     newParameters.Difficulty.IndestructibleFacilities = mr.Read<bool>();
                     newParameters.Difficulty.MissingCrewsRespawn = mr.Read<bool>();
+                    newParameters.Difficulty.ReentryHeatScale = mr.Read<float>();
+                    newParameters.Difficulty.ResourceAbundance = mr.Read<float>();
                     newParameters.Career.FundsGainMultiplier = mr.Read<float>();
                     newParameters.Career.FundsLossMultiplier = mr.Read<float>();
                     newParameters.Career.RepGainMultiplier = mr.Read<float>();
