@@ -1877,7 +1877,7 @@ namespace DarkMultiPlayer
             QueueOutgoingMessage(newMessage, false);
         }
         //Called from ScenarioWorker
-        public void SendScenarioModuleData(string[] scenarioNames, byte[][] scenarioData)
+        public void SendScenarioModuleData(string[] scenarioNames, byte[][] scenarioData, bool highPriority = false)
         {
             ClientMessage newMessage = new ClientMessage();
             newMessage.type = ClientMessageType.SCENARIO_DATA;
@@ -1891,24 +1891,7 @@ namespace DarkMultiPlayer
                 newMessage.data = mw.GetMessageBytes();
             }
             DarkLog.Debug("Sending " + scenarioNames.Length + " scenario modules");
-            QueueOutgoingMessage(newMessage, false);
-        }
-        // Same method as above, only that in this, the message is queued as high priority
-        public void SendScenarioModuleDataHighPriority(string[] scenarioNames, byte[][] scenarioData)
-        {
-            ClientMessage newMessage = new ClientMessage();
-            newMessage.type = ClientMessageType.SCENARIO_DATA;
-            using (MessageWriter mw = new MessageWriter())
-            {
-                mw.Write<string[]>(scenarioNames);
-                foreach (byte[] scenarioBytes in scenarioData)
-                {
-                    mw.Write<byte[]>(Compression.CompressIfNeeded(scenarioBytes));
-                }
-                newMessage.data = mw.GetMessageBytes();
-            }
-            DarkLog.Debug("Sending " + scenarioNames.Length + " scenario modules (high priority)");
-            QueueOutgoingMessage(newMessage, true);
+            QueueOutgoingMessage(newMessage, highPriority);
         }
 
         public void SendKerbalProtoMessage(string kerbalName, byte[] kerbalBytes)

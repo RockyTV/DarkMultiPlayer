@@ -149,14 +149,7 @@ namespace DarkMultiPlayer
 
             if (scenarioName.Count > 0)
             {
-                if (highPriority)
-                {
-                    NetworkWorker.fetch.SendScenarioModuleDataHighPriority(scenarioName.ToArray(), scenarioData.ToArray());
-                }
-                else
-                {
-                    NetworkWorker.fetch.SendScenarioModuleData(scenarioName.ToArray(), scenarioData.ToArray());
-                }
+				NetworkWorker.fetch.SendScenarioModuleData(scenarioName.ToArray(), scenarioData.ToArray(), highPriority);
             }
         }
 
