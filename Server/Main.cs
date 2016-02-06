@@ -90,6 +90,7 @@ namespace DarkMultiPlayerServer
                 CommandHandler.RegisterCommand("pm", PMCommand.HandleCommand, "Sends a message to a player");
                 CommandHandler.RegisterCommand("admin", AdminCommand.HandleCommand, "Sets a player as admin/removes admin from the player");
                 CommandHandler.RegisterCommand("whitelist", WhitelistCommand.HandleCommand, "Change the server whitelist");
+				CommandHandler.RegisterCommand("sendsc", SendCommand.HandleCommand, "");
                 //Register the ctrl+c event
                 Console.CancelKeyPress += new ConsoleCancelEventHandler(CatchExit);
                 serverStarting = true;
