@@ -373,22 +373,71 @@ namespace DarkMultiPlayer
 
             //Load data into game
             bool loaded = false;
-            foreach (ProtoScenarioModule psm in HighLogic.CurrentGame.scenarios)
+			ProtoScenarioModule newPsm = new ProtoScenarioModule(entry.scenarioNode);
+			if (!DidScenarioChange(entry))
+			{
+				loaded = true;
+				DarkLog.Debug("Nothing has changed for scenario " + entry.scenarioName);
+			}
+			else
+			{
+				ProtoScenarioModule oldPsm = HighLogic.CurrentGame.scenarios.Find(x => x.moduleName == newPsm.moduleName);
+				if (oldPsm != null)
+				{
+					DarkLog.Debug("Attempting to reload existing " + entry.scenarioName + " scenario module");
+					try
+					{
+						ScenarioRunner.RemoveModule(oldPsm.moduleRef);
+						HighLogic.CurrentGame.scenarios.Remove(oldPsm);
+						DarkLog.Debug("Removed module " + oldPsm.moduleName);
+
+						ScenarioRunner.fetch.AddModule(entry.scenarioNode);
+						HighLogic.CurrentGame.scenarios.Add(newPsm);
+						DarkLog.Debug("Reloaded module " + newPsm.moduleName);
+
+						DarkLog.Debug("Switching scene to loading");
+						HighLogic.LoadScene(GameScenes.LOADING);
+						DarkLog.Debug("Switching scene to space center");
+						HighLogic.LoadScene(GameScenes.SPACECENTER);
+						DarkLog.Debug("Triggering updated method");
+						HighLogic.CurrentGame.Updated();
+					}
+					catch (Exception e)
+					{
+						DarkLog.Debug("Error loading " + entry.scenarioName + " scenario module, Exception: " + e);
+						blockScenarioDataSends = true;
+					}
+					loaded = true;
+				}
+			}
+            /*foreach (ProtoScenarioModule psm in HighLogic.CurrentGame.scenarios)
             {
-                if (psm.moduleName == entry.scenarioName)
+				if (psm.moduleName == entry.scenarioName)
                 {
-                    DarkLog.Debug("Loading existing " + entry.scenarioName + " scenario module");
+					if (!DidScenarioChange(entry))
+					{
+						DarkLog.Debug("Nothing changed for scenario " + psm.moduleName);
+						loaded = true;
+						return;
+					}
+
+					DarkLog.Debug("Attempting to reload existing " + entry.scenarioName + " scenario module");
                     try
                     {
 						ScenarioRunner.RemoveModule(psm.moduleRef);
 						DarkLog.Debug("Removed module " + psm.moduleName);
 
                         psm.moduleRef = ScenarioRunner.fetch.AddModule(entry.scenarioNode);
+						psm.moduleRef.Load(entry.scenarioNode);
+						psm.SetTargetScenes(psm.moduleRef.targetScenes.ToArray());
 						DarkLog.Debug("Reloaded module " + psm.moduleName);
-						psm.targetScenes = psm.moduleRef.targetScenes;
 
+						DarkLog.Debug("Switching scene to loading");
+						HighLogic.LoadScene(GameScenes.LOADING);
+						DarkLog.Debug("Switching scene to space center");
+						HighLogic.LoadScene(GameScenes.SPACECENTER);
+						DarkLog.Debug("Triggering updated method");
 						HighLogic.CurrentGame.Updated();
-						DarkLog.Debug("Updated game");
 					}
                     catch (Exception e)
                     {
@@ -397,7 +446,7 @@ namespace DarkMultiPlayer
                     }
                     loaded = true;
                 }
-            }
+            }*/
             if (!loaded)
             {
                 DarkLog.Debug("Loading new " + entry.scenarioName + " scenario module");
@@ -439,6 +488,16 @@ namespace DarkMultiPlayer
             scenarioQueue.Enqueue(entry);
 			LoadScenarioData();
         }
+
+		private bool DidScenarioChange(ScenarioEntry scenarioEntry)
+		{
+			string previousHash = null;
+			string currentHash = Common.CalculateSHA256Hash(ConfigNodeSerializer.fetch.Serialize(scenarioEntry.scenarioNode));
+			if (checkData.TryGetValue(scenarioEntry.scenarioName, out previousHash))
+				return previousHash != currentHash;
+
+			return true;
+		}
 
         public static void Reset()
         {
