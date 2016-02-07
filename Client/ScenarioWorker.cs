@@ -380,13 +380,16 @@ namespace DarkMultiPlayer
                     DarkLog.Debug("Loading existing " + entry.scenarioName + " scenario module");
                     try
                     {
-                        if (psm.moduleRef == null)
-                        {
-                            DarkLog.Debug("Fixing null scenario module!");
-                            psm.moduleRef = new ScenarioModule();
-                        }
-                        psm.moduleRef.Load(entry.scenarioNode);
-                    }
+						ScenarioRunner.RemoveModule(psm.moduleRef);
+						DarkLog.Debug("Removed module " + psm.moduleName);
+
+                        psm.moduleRef = ScenarioRunner.fetch.AddModule(entry.scenarioNode);
+						DarkLog.Debug("Reloaded module " + psm.moduleName);
+						psm.targetScenes = psm.moduleRef.targetScenes;
+
+						HighLogic.CurrentGame.Updated();
+						DarkLog.Debug("Updated game");
+					}
                     catch (Exception e)
                     {
                         DarkLog.Debug("Error loading " + entry.scenarioName + " scenario module, Exception: " + e);
@@ -417,12 +420,24 @@ namespace DarkMultiPlayer
             }
         }
 
+		public void LoadScenarioData()
+		{
+			if (Client.fetch.initialScenarioSyncDone)
+			{
+				while (scenarioQueue.Count > 0)
+				{
+					LoadScenarioData(scenarioQueue.Dequeue());
+				}
+			}
+		}
+
         public void QueueScenarioData(string scenarioName, ConfigNode scenarioData)
         {
             ScenarioEntry entry = new ScenarioEntry();
             entry.scenarioName = scenarioName;
             entry.scenarioNode = scenarioData;
             scenarioQueue.Enqueue(entry);
+			LoadScenarioData();
         }
 
         public static void Reset()

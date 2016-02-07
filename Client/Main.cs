@@ -41,6 +41,7 @@ namespace DarkMultiPlayer
         private Dictionary<CelestialBody, double> bodiesGees = new Dictionary<CelestialBody,double>();
         //Command line connect
         public static ServerEntry commandLineConnect;
+		public bool initialScenarioSyncDone = false;
 
         // Server setting
         public GameDifficulty serverDifficulty;
@@ -530,6 +531,7 @@ namespace DarkMultiPlayer
             GamePersistence.SaveGame(HighLogic.CurrentGame, "persistent", HighLogic.SaveFolder, SaveMode.OVERWRITE);
             HighLogic.CurrentGame.Start();
             ChatWorker.fetch.display = true;
+			initialScenarioSyncDone = true;
             DarkLog.Debug("Started!");
         }
 
