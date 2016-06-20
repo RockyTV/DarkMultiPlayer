@@ -4,6 +4,9 @@ using UnityEngine;
 
 namespace DarkMultiPlayer
 {
+    [KSPScenario(ScenarioCreationOptions.None, null)]
+    class DiscoverableObjects : ScenarioModule { }
+
     public class AsteroidWorker
     {
         //singleton
