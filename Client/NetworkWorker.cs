@@ -150,6 +150,7 @@ namespace DarkMultiPlayer
                 state = ClientState.RUNNING;
                 Client.fetch.status = "Running";
                 Client.fetch.gameRunning = true;
+                Client.fetch.lastInputTime = UnityEngine.Time.realtimeSinceStartup;
                 AsteroidWorker.fetch.workerEnabled = true;
                 VesselWorker.fetch.workerEnabled = true;
                 HackyInAtmoLoader.fetch.workerEnabled = true;
@@ -1057,6 +1058,7 @@ namespace DarkMultiPlayer
                 ChatWorker.fetch.consoleIdentifier = mr.Read<string>();
                 Client.fetch.serverDifficulty = (GameDifficulty)mr.Read<int>();
                 VesselWorker.fetch.safetyBubbleDistance = mr.Read<float>();
+                Client.fetch.maxIdleTimeBeforeBeingKicked = mr.Read<float>() * 60;
                 if (Client.fetch.serverDifficulty != GameDifficulty.CUSTOM)
                 {
                     Client.fetch.serverParameters = GameParameters.GetDefaultParameters(Client.fetch.ConvertGameMode(Client.fetch.gameMode), (GameParameters.Preset)Client.fetch.serverDifficulty);

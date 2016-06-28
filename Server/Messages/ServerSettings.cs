@@ -28,6 +28,7 @@ namespace DarkMultiPlayerServer.Messages
                 mw.Write<string>(Settings.settingsStore.consoleIdentifier);
                 mw.Write<int>((int)Settings.settingsStore.gameDifficulty);
                 mw.Write<float>(Settings.settingsStore.safetyBubbleDistance);
+                mw.Write<float>(Settings.settingsStore.idleKick);
 
                 if (Settings.settingsStore.gameDifficulty == GameDifficulty.CUSTOM)
                 {

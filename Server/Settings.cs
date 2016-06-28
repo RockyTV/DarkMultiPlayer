@@ -92,5 +92,7 @@ namespace DarkMultiPlayerServer
         public double expireLogs = 0;
         [Description("Specify the minimum distance in which vessels can interact with eachother at the launch pad and runway")]
         public float safetyBubbleDistance = 100.0f;
+        [Description("Specify how many minutes before a user is kicked for being idle too long. 0 = Disabled")]
+        public float idleKick = 0f;
     }
 }

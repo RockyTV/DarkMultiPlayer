@@ -41,6 +41,9 @@ namespace DarkMultiPlayer
         private Dictionary<CelestialBody, double> bodiesGees = new Dictionary<CelestialBody,double>();
         //Command line connect
         public static ServerEntry commandLineConnect;
+        //Idle time check
+        public float lastInputTime = 0f;
+        public float maxIdleTimeBeforeBeingKicked;
 
         // Server setting
         public GameDifficulty serverDifficulty;
@@ -382,6 +385,20 @@ namespace DarkMultiPlayer
                         foreach (KeyValuePair<CelestialBody, double> gravityEntry in bodiesGees)
                         {
                             gravityEntry.Key.GeeASL = gravityEntry.Value;
+                        }
+                    }
+
+                    if (Input.anyKeyDown || Input.anyKey)
+                    {
+                        lastInputTime = UnityEngine.Time.realtimeSinceStartup;
+                    }
+
+                    if (maxIdleTimeBeforeBeingKicked > 0f && lastInputTime > 0f)
+                    {
+                        if ((UnityEngine.Time.realtimeSinceStartup - lastInputTime) > maxIdleTimeBeforeBeingKicked)
+                        {
+                            lastInputTime = 0f;
+                            NetworkWorker.fetch.SendDisconnect("Player is idle");
                         }
                     }
 
